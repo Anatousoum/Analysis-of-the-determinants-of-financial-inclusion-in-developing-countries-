@@ -1,0 +1,78 @@
+##Read CSV File into R
+FI_analysis<-read.csv("FI_Analysis.csv")
+
+install.packages("DataExplorer")
+library(DataExplorer)
+library(ggplot2)
+plot_missing(FI_Analysis)
+plot_bar(FI_Analysis)
+plot_correlation(FI_Analysis)
+
+summary(FI_analysis)
+ ##Remove unnecessary colums
+attach(FI_Analysis)
+FI_Analysis1.df<-c(1,2,4,5,6,7,9,14,15,16,17,21,22,23,24,25,26)
+library(dplyr)
+library(readr)
+library(dplyr)
+select(FI_Analysis.df, -c(Country, LifeIns_Cov,NLifeIns_Cov, credit, debit, deposit, withdrawal))
+FI_Analysis_1<- data.frame(account,FI_Level1,FI_Level2,female,age,age^2,inc_q, emp_in,educ,emergency_fund,gov_payment, FF_Index, Ins_Cov,
+                              ATM_Access, Bank_Access, NFIS)
+FI_basic<-data.frame(account,female,age,`age^2`,inc_q, emp_in,educ,emergency_fund,gov_payment, FF_Index, Ins_Cov,
+                        ATM_Access, Bank_Access, NFIS)
+FI_Lev1<-data.frame(FI_Level1,female,age,`age^2`,inc_q, emp_in,educ,emergency_fund,gov_payment, FF_Index, Ins_Cov,
+                       ATM_Access, Bank_Access, NFIS)
+FI_Lev2<-data.frame(FI_Level2,female,age,`age^2`,inc_q, emp_in,educ,emergency_fund,gov_payment, FF_Index, Ins_Cov,
+                       ATM_Access, Bank_Access, NFIS)
+cormatBasic<-round(cor(FI_basic.df),3)
+head(cormatBasic)
+install.packages("ggcorrplot")
+library(ggcorrplot)
+ggcorrplot(cormatBasic, method = "circle")
+ggcorrplot(cormatBasic, hc.order = TRUE, type = "lower",
+           lab = TRUE)
+cormatlev1<-round(cor(FI_Lev1.df),3)
+cormatlev2<-round(cor(FI_Lev2.df),3)
+ggcorrplot(cormatlev1, hc.order = TRUE, type = "lower",
+           lab = TRUE)
+ggcorrplot(cormatlev2, hc.order = TRUE, type = "lower",
+           lab = TRUE)
+
+###Summary statistics
+library(stargazer)
+stargazer(FI_Analysis_1.df)
+stargazer(FI_Analysis_1.df, type = "html")
+summary(FI_Analysis_1.df)
+stargazer(FI_Analysis_1.df, type = 'text')
+
+install.packages("psych")
+library(psych)
+describe(FI_Analysis_1.df)
+
+## Plots 
+hist(age)
+library(ggplot2)
+attach(FI_Analysis_1.df)
+qplot(age, geom="histogram",binwidth=5, main="Histogram for Age", 
+      xlab="Age", 
+      fill=I("blue"), 
+      col=I("red"), 
+      alpha=) ##age
+qplot(female, geom="histogram",binwidth=5, main="Histogram for Age", 
+      xlab="Age", 
+      fill=I("blue"), 
+      col=I("red"), 
+      alpha=) ##Gender Nope !
+
+## Scatter plot of strongly correlated variables 
+#bank access vs atm access
+install.packages("ggpubr")
+library("ggpubr")
+ggscatter(FI_Analysis.df, x = "Bank_Access", y = "ATM_Access",     add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Bank branches per 100,000 adults", ylab = "ATMs per 100,000 adults")
+###Linear regression
+#Model 1
+attach(FI_basic)
+LM_Basic<-lm(formula = account ~ female + age + inc_q + emp_in + educ + emergency_fund + gov_payment +FF_Index + Ins_Cov + ATM_Access + Bank_Access + NFIS )
+summary(LM_Basic)
